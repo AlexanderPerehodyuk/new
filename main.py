@@ -3,7 +3,7 @@ from math import cos, pi, sin, radians
 
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QMouseEvent, QImage, QPen, QPainter
-from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QAction, QFileDialog
+from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QAction, QFileDialog, QSlider, QColorDialog
 
 
 class mw(QMainWindow):
@@ -21,7 +21,7 @@ class mw(QMainWindow):
         #устанавливаем, чтобы изанчальнно не рисовали
         self.drawing = False
         #устанавливаем размер кисточки
-        self.brushSize = 2
+        self.brushSize = 3
         #цвет кисточки
         self.brushColor = Qt.black
         #последняя точка
@@ -78,29 +78,9 @@ class mw(QMainWindow):
         whiteAction.triggered.connect(self.wColor)
 
         #анологично как и для 3 пикселей
-        blackAction = QAction("Black", self)
-        brushColor.addAction(blackAction)
-        blackAction.triggered.connect(self.bColor)
-
-        #анологично как и для 3 пикселей
-        redAction = QAction("Red", self)
-        brushColor.addAction(redAction)
-        redAction.triggered.connect(self.rColor)
-
-        #анологично как и для 3 пикселей
-        GreenAction = QAction("Green", self)
-        brushColor.addAction(GreenAction)
-        GreenAction.triggered.connect(self.gColor)
-
-        #анологично как и для 3 пикселей
-        blueAction = QAction("Blue", self)
-        brushColor.addAction(blueAction)
-        blueAction.triggered.connect(self.bColor)
-
-        #анологично как и для 3 пикселей
-        yAction = QAction("Yellow", self)
-        brushColor.addAction(yAction)
-        yAction.triggered.connect(self.yColor)
+        colorAction = QAction("Выбрать цвет", self)
+        brushColor.addAction(colorAction)
+        colorAction.triggered.connect(self.bColor)
 
 
     def mousePressEvent(self, event):
@@ -132,14 +112,14 @@ class mw(QMainWindow):
         
     def save(self):
         #сохранение путя для сохранение фото и сохранение если путь указан
-        filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);; ALL Files(*.*)")
+        filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg)")
         if filePath == "":
           return
         else:
           self.image.save(filePath)
     
     def open(self):
-        filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);; ALL Files(*.*)")
+        filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg)")
         if filePath == "":
           return
         else:
@@ -163,28 +143,15 @@ class mw(QMainWindow):
         self.brushSize = 9
 
     def bColor(self):
-      #цвет линии при рисовки будет черный до следущего изменения
-        self.brushColor = Qt.black
+      #вызывается диалоговое окно, там пользователь выбирает цвет и если он выбран без ошибок устанавливается для кисточки
+        col = QColorDialog.getColor()
+        if col.isValid():
+          self.brushColor = col
+
         
     def wColor(self):
         #цвет линии при рисовки будет черный до следущего изменения
         self.brushColor = Qt.white
-        
-    def rColor(self):
-        #цвет линии при рисовки будет красный до следущего изменения
-        self.brushColor = Qt.red
-        
-    def gColor(self):
-        #цвет линии при рисовки будет зеленый до следущего изменения
-        self.brushColor = Qt.green
-        
-    def bColor(self):
-        #цвет линии при рисовки будет синий до следущего изменения
-        self.brushColor = Qt.blue
-        
-    def yColor(self):
-        #цвет линии при рисовки будет желтый до следущего изменения
-        self.brushColor = Qt.yellow
 
 
 if __name__ == '__main__':
