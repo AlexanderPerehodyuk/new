@@ -22,6 +22,7 @@ class mw(QMainWindow):
         self.label = QLabel(self)
         self.label.resize(500, 500)
         self.label.setPixmap(self.pixmap)
+        
         #устанавливаем, чтобы изанчальнно не рисовали
         self.drawing = False
         #устанавливаем размер кисточки
@@ -122,7 +123,7 @@ class mw(QMainWindow):
           self.image.save(filePath)
     
     def open(self):
-        filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg)")
+        filePath, _ = QFileDialog.getOpenFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg)")
         if filePath == "":
           return
         else:
@@ -136,10 +137,9 @@ class mw(QMainWindow):
         self.update()
 
     def tp(self):
-        #размер линии при рисовки будет 3 до следущего изменения
-        self.brushSize = 3
-        bs = BrushSize(self)
-        bs.show()
+        #размер линии до следущего изменения
+        self.bs = BrushSize(self)
+        self.bs.show()
 
     def bColor(self):
       #вызывается диалоговое окно, там пользователь выбирает цвет и если он выбран без ошибок устанавливается для кисточки
@@ -153,27 +153,21 @@ class mw(QMainWindow):
         self.brushColor = Qt.white
     
     def setSize(self, value):
-      self.brushize = value
-
-    def c(self):
-      return self.brushColor
-    
-    def s(self):
-      return self.brushSize
+      self.brushSize = value
 
 
 class BrushSize(QWidget):
   def __init__(self, m):
     super().__init__()
-    self.move(50,0)
+    self.move(50,20)
     self.resize(50, 100)
     self.slider = QSlider(Qt.Horizontal, self)
     self.slider.setMaximum(20)
     self.slider.setMinimum(1)
     self.slider.valueChanged[int].connect(self.changeValue)
     self.m = m
-    self.brushSize = self.m.s()
-    self.brushColor = self.m.c()
+    self.brushSize = self.m.brushSize
+    self.brushColor = self.m.brushColor
     self.btn = QPushButton(self)
     self.btn.resize(20, 20)
     self.btn.setText("Ok")
@@ -181,7 +175,8 @@ class BrushSize(QWidget):
     self.btn.clicked.connect(self.ok)
   
   def ok(self):
-    self.m.setSize(self.slider.value)
+    print(self.brushSize)
+    self.m.brushSize = self.brushSize
     self.hide()
 
   def changeValue(self, value):
