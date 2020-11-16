@@ -138,7 +138,7 @@ class mw(QMainWindow):
     def tp(self):
         #размер линии при рисовки будет 3 до следущего изменения
         self.brushSize = 3
-        bs = BrushSize()
+        bs = BrushSize(self)
         bs.show()
 
     def bColor(self):
@@ -163,14 +163,15 @@ class mw(QMainWindow):
 
 
 class BrushSize(QWidget):
-  def __init__(self):
+  def __init__(self, m):
     super().__init__()
     self.move(50,0)
     self.resize(50, 100)
     self.slider = QSlider(Qt.Horizontal, self)
     self.slider.setMaximum(20)
+    self.slider.setMinimum(1)
     self.slider.valueChanged[int].connect(self.changeValue)
-    self.m = mw()
+    self.m = m
     self.brushSize = self.m.s()
     self.brushColor = self.m.c()
     self.btn = QPushButton(self)
