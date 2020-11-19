@@ -19,9 +19,6 @@ class mw(QMainWindow):
         self.image = QImage(self.size(), QImage.Format_RGB32)
         self.image.fill(Qt.white)
         self.pixmap = QPixmap.fromImage(self.image)
-        self.label = QLabel(self)
-        self.label.resize(500, 500)
-        self.label.setPixmap(self.pixmap)
         
         #устанавливаем, чтобы изанчальнно не рисовали
         self.drawing = False
@@ -99,7 +96,7 @@ class mw(QMainWindow):
             
     def paintEvent(self, event):
           canvaspainter = QPainter(self)
-          canvaspainter.drawImage(self.rect(), self.image, self.image.rect())
+          canvaspainter.drawImage(self.image.rect(), self.image)
           if self.drawing:
             self.drawLine()
 
@@ -109,8 +106,6 @@ class mw(QMainWindow):
         painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         painter.drawLine(self.lastPoint, self.currentPoint)
         self.lastPoint = self.currentPoint
-        self.pixmap = QPixmap.fromImage(self.image)
-        self.label.setPixmap(self.pixmap)
         painter.end()
         self.update()
 
@@ -129,7 +124,10 @@ class mw(QMainWindow):
         else:
           self.image = QImage(filePath)
         self.pixmap = QPixmap.fromImage(self.image)
-        self.label.setPixmap(self.pixmap)
+        if self.image.height() >= 500 and self.image.width() > 500:
+          p = self.pixmap.scaled(self.height() - self.menuBar().height(), self.width(), Qt.KeepAspectRatio, Qt.FastTransformation)
+          self.pixmap = p
+          self.image = QImage(self.pixmap)
           
     def clear(self):
         #очищение холста и обновление экрана
