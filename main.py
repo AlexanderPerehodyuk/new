@@ -124,11 +124,9 @@ class mw(QMainWindow):
         else:
           self.image = QImage(filePath)
         self.pixmap = QPixmap.fromImage(self.image)
-        if self.image.height() >= 500 and self.image.width() > 500:
-          p = self.pixmap.scaled(self.height() - self.menuBar().height(), self.width(), Qt.KeepAspectRatio, Qt.FastTransformation)
-          self.pixmap = p
-          self.image = QImage(self.pixmap)
-          
+        p = self.pixmap.scaled(self.height() - self.menuBar().height(), self.width(), Qt.KeepAspectRatio, Qt.FastTransformation)
+        self.pixmap = p
+        self.image = QImage(self.pixmap)
     def clear(self):
         #очищение холста и обновление экрана
         self.image.fill(Qt.white)
