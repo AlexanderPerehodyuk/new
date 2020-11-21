@@ -38,14 +38,14 @@ class mw(QMainWindow):
         fileMenu = mainMenu.addMenu("File")
 
         #добавление меню для изменение размера кисточки
-        brushMenu = mainMenu.addMenu("Brush Size")
+        brushMenu = mainMenu.addMenu("Size")
 
         #добавление меню для измение цвета кисточки
-        brushColor = mainMenu.addMenu("Brush Color")
+        brushColor = mainMenu.addMenu("Color")
 
-        brushLine = mainMenu.addMenu("Brush Line")
+        brushLine = mainMenu.addMenu("Line")
 
-        brush = mainMenu.addMenu("Чем рисовать")
+        brush = mainMenu.addMenu("Инструменты")
 
         SolidAction = QAction("Solid Line", self)
         brushLine.addAction(SolidAction)
@@ -66,18 +66,21 @@ class mw(QMainWindow):
         pensilAction = QAction("Карандаш", self)
         brush.addAction(pensilAction)
         pensilAction.triggered.connect(self.pensil)
+        roundAction = QAction("Овал", self)
+        brush.addAction(roundAction)
+        roundAction.triggered.connect(self.circle)
 
         lineAction = QAction("Прямая линия", self)
         brush.addAction(lineAction)
         lineAction.triggered.connect(self.line)
 
-        roundAction = QAction("Овал", self)
-        brush.addAction(roundAction)
-        roundAction.triggered.connect(self.circle)
-
         rectAction = QAction("Прямоугольник", self)
         brush.addAction(rectAction)
         rectAction.triggered.connect(self.rect)
+
+        blineAction = QAction("Жирная линия", self)
+        brush.addAction(blineAction)
+        blineAction.triggered.connect(self.bline)
 
         #создание кнопки для сохранения картинки
         saveAction = QAction("Save", self)
@@ -125,7 +128,7 @@ class mw(QMainWindow):
             self.lastPoint = event.pos()
             self.currentPoint = event.pos()
             self.repaint()
-          elif event.button() == Qt.RightButton and self.br != 0:
+          elif event.button() == Qt.RightButton and self.br != 0 and self.br != 4:
             self.drawing = True
             self.currentPoint = event.pos()
             self.repaint()
@@ -152,7 +155,7 @@ class mw(QMainWindow):
       painter = QPainter(self.image)
       painter.begin(self.image)
       painter.setPen(QPen(self.brushColor, self.brushSize,self.brushLine , Qt.RoundCap, Qt.RoundJoin))
-      if self.br == 0:
+      if self.br == 0 or self.br == 4:
         painter.drawLine(self.lastPoint, self.currentPoint)
         self.lastPoint = self.currentPoint
         painter.end()
@@ -231,18 +234,27 @@ class mw(QMainWindow):
 
     def pensil(self):
       self.br = 0
+      self.brushSize = 2
       self.Solid()
 
     def line(self):
       self.br = 1
+      self.brushSize = 2
       self.Solid()
     
     def circle(self):
       self.br = 2
+      self.brushSize = 2
       self.Solid()
     
     def rect(self):
       self.br = 3
+      self.brushSize = 2
+      self.Solid()
+
+    def bline(self):
+      self.br = 4
+      self.brushSize = 21
       self.Solid()
 
 class BrushSize(QWidget):
@@ -251,12 +263,19 @@ class BrushSize(QWidget):
     self.move(50,20)
     self.resize(50, 100)
     self.slider = QSlider(Qt.Horizontal, self)
+    
     self.slider.setMaximum(20)
     self.slider.setMinimum(1)
     self.slider.valueChanged[int].connect(self.changeValue)
+
     self.m = m
+    if self.m.br == 3:
+      self.slider.setMaximum(30)
+      self.slider.setMinimum(21)
+
     self.brushSize = self.m.brushSize
     self.brushColor = self.m.brushColor
+
     self.btn = QPushButton(self)
     self.btn.resize(20, 20)
     self.btn.setText("Ok")
