@@ -185,6 +185,7 @@ class mw(QMainWindow):
           painter.drawText(self.lastPoint, t)
           painter.end()
           self.update()
+          self.drawing = False
 
     def save(self):
         #сохранение путя для сохранение фото и сохранение если путь указан
