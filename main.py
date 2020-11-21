@@ -1,7 +1,7 @@
 import sys
 from math import cos, pi, sin, radians
 
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtCore import Qt, QPoint, QRect
 from PyQt5.QtGui import QMouseEvent, QImage, QPen, QPainter, QPixmap
 from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QAction, QFileDialog, QSlider, QColorDialog, QPushButton
 
@@ -26,8 +26,12 @@ class mw(QMainWindow):
         self.brushSize = 3
         #цвет кисточки
         self.brushColor = Qt.black
+
+        self.brushLine = Qt.SolidLine
         #последняя точка
         self.currentPoint = self.lastPoint = QPoint()
+        #для выбора чем рисовать пригодиться
+        self.br = 0
         #делаем menuBar чтобы там были элементы для изменения увета, размера кисточки, сохранения нарисованного и очистки 
         mainMenu = self.menuBar()
         #добавления меню для работы с файлом(сохранене, очистки)
@@ -38,6 +42,42 @@ class mw(QMainWindow):
 
         #добавление меню для измение цвета кисточки
         brushColor = mainMenu.addMenu("Brush Color")
+
+        brushLine = mainMenu.addMenu("Brush Line")
+
+        brush = mainMenu.addMenu("Чем рисовать")
+
+        SolidAction = QAction("Solid Line", self)
+        brushLine.addAction(SolidAction)
+        SolidAction.triggered.connect(self.Solid)
+
+        DashAction = QAction("Dash Line", self)
+        brushLine.addAction(DashAction)
+        DashAction.triggered.connect(self.Dash)
+
+        DashDotAction = QAction("DashDot Line", self)
+        brushLine.addAction(DashDotAction)
+        DashDotAction.triggered.connect(self.DashDot)
+
+        DashDotDotAction = QAction("DashDotDot Line", self)
+        brushLine.addAction(DashDotDotAction)
+        DashDotDotAction.triggered.connect(self.DashDotDot)
+
+        pensilAction = QAction("Карандаш", self)
+        brush.addAction(pensilAction)
+        pensilAction.triggered.connect(self.pensil)
+
+        lineAction = QAction("Прямая линия", self)
+        brush.addAction(lineAction)
+        lineAction.triggered.connect(self.line)
+
+        roundAction = QAction("Овал", self)
+        brush.addAction(roundAction)
+        roundAction.triggered.connect(self.circle)
+
+        rectAction = QAction("Прямоугольник", self)
+        brush.addAction(rectAction)
+        rectAction.triggered.connect(self.rect)
 
         #создание кнопки для сохранения картинки
         saveAction = QAction("Save", self)
@@ -74,6 +114,10 @@ class mw(QMainWindow):
         brushColor.addAction(colorAction)
         colorAction.triggered.connect(self.bColor)
 
+        fillAction = QAction("Залить экран", self)
+        brushColor.addAction(fillAction)
+        fillAction.triggered.connect(self.fill)
+
     def mousePressEvent(self, event):
         #при нажатии на кнопку в последнию кнопку передается места где была нажата кнопка и рисование становиться True
           if event.button() == Qt.LeftButton:
@@ -81,7 +125,11 @@ class mw(QMainWindow):
             self.lastPoint = event.pos()
             self.currentPoint = event.pos()
             self.repaint()
-            
+          elif event.button() == Qt.RightButton and self.br != 0:
+            self.drawing = True
+            self.currentPoint = event.pos()
+            self.repaint()
+            self.drawing = False
 
     def mouseMoveEvent(self, event):
         #предача текущего значения местоположения курсора если мы рисуем
@@ -101,11 +149,24 @@ class mw(QMainWindow):
             self.drawLine()
 
     def drawLine(self):
-        painter = QPainter(self.image)
-        painter.begin(self.image)
-        painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+      painter = QPainter(self.image)
+      painter.begin(self.image)
+      painter.setPen(QPen(self.brushColor, self.brushSize,self.brushLine , Qt.RoundCap, Qt.RoundJoin))
+      if self.br == 0:
         painter.drawLine(self.lastPoint, self.currentPoint)
         self.lastPoint = self.currentPoint
+        painter.end()
+        self.update()
+      elif self.br == 1:
+        painter.drawLine(self.lastPoint, self.currentPoint)
+        painter.end()
+        self.update()
+      elif self.br == 2:
+        painter.drawEllipse(QRect(self.lastPoint, self.currentPoint))
+        painter.end()
+        self.update()
+      elif self.br == 3:
+        painter.drawRect(QRect(self.lastPoint, self.currentPoint))
         painter.end()
         self.update()
 
@@ -143,14 +204,46 @@ class mw(QMainWindow):
         if col.isValid():
           self.brushColor = col
 
-        
     def wColor(self):
         #цвет линии при рисовки будет черный до следущего изменения
         self.brushColor = Qt.white
     
     def setSize(self, value):
       self.brushSize = value
+    
+    def Solid(self):
+      self.brushLine = Qt.SolidLine
+    
+    def Dash(self):
+      self.brushLine = Qt.DashLine
+    
+    def DashDot(self):
+      self.brushLine = Qt.DashDotLine
 
+    def DashDotDot(self):
+      self.brushLine = Qt.DashDotDotLine
+
+    def fill(self):
+      col = QColorDialog.getColor()
+      if col.isValid():
+          self.image.fill(col)
+          self.update()
+
+    def pensil(self):
+      self.br = 0
+      self.Solid()
+
+    def line(self):
+      self.br = 1
+      self.Solid()
+    
+    def circle(self):
+      self.br = 2
+      self.Solid()
+    
+    def rect(self):
+      self.br = 3
+      self.Solid()
 
 class BrushSize(QWidget):
   def __init__(self, m):
@@ -181,7 +274,7 @@ class BrushSize(QWidget):
   
   def paintEvent(self, e):
     painter = QPainter(self)
-    painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+    painter.setPen(QPen(self.brushColor, self.brushSize, self.m.brushLine, Qt.RoundCap, Qt.RoundJoin))
     painter.drawLine(0, 50, 100, 50)
 
 
