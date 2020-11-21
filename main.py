@@ -3,7 +3,7 @@ from math import cos, pi, sin, radians
 
 from PyQt5.QtCore import Qt, QPoint, QRect
 from PyQt5.QtGui import QMouseEvent, QImage, QPen, QPainter, QPixmap
-from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QAction, QFileDialog, QSlider, QColorDialog, QPushButton
+from PyQt5.QtWidgets import QWidget, QApplication, QMainWindow, QLabel, QMenuBar, QMenu, QAction, QFileDialog, QSlider, QColorDialog, QPushButton, QInputDialog
 
 
 class mw(QMainWindow):
@@ -77,6 +77,10 @@ class mw(QMainWindow):
         rectAction = QAction("Прямоугольник", self)
         brush.addAction(rectAction)
         rectAction.triggered.connect(self.rect)
+
+        textAction = QAction("Текст", self)
+        brush.addAction(textAction)
+        textAction.triggered.connect(self.text)
 
         blineAction = QAction("Жирная линия", self)
         brush.addAction(blineAction)
@@ -172,6 +176,15 @@ class mw(QMainWindow):
         painter.drawRect(QRect(self.lastPoint, self.currentPoint))
         painter.end()
         self.update()
+      elif self.br == 5:
+        x = QInputDialog(self)
+        t, ok= x.getText(self, '',
+            'текст для рисовки:')
+        x.hide()
+        if ok:
+          painter.drawText(self.lastPoint, t)
+          painter.end()
+          self.update()
 
     def save(self):
         #сохранение путя для сохранение фото и сохранение если путь указан
@@ -255,6 +268,11 @@ class mw(QMainWindow):
     def bline(self):
       self.br = 4
       self.brushSize = 21
+      self.Solid()
+
+    def text(self):
+      self.br = 5
+      self.brushSize = 2
       self.Solid()
 
 class BrushSize(QWidget):
