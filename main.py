@@ -31,7 +31,7 @@ class mw(QMainWindow):
         #последняя точка
         self.currentPoint = self.lastPoint = QPoint()
         #для выбора чем рисовать пригодиться
-        self.br = 0
+        self.brushTipe = 0
         #делаем menuBar чтобы там были элементы для изменения увета, размера кисточки, сохранения нарисованного и очистки 
         mainMenu = self.menuBar()
         #добавления меню для работы с файлом(сохранене, очистки)
@@ -132,7 +132,7 @@ class mw(QMainWindow):
             self.lastPoint = event.pos()
             self.currentPoint = event.pos()
             self.repaint()
-          elif event.button() == Qt.RightButton and self.br != 0 and self.br != 4:
+          elif event.button() == Qt.RightButton and self.brushTipe != 0 and self.brushTipe != 4:
             self.drawing = True
             self.currentPoint = event.pos()
             self.repaint()
@@ -148,6 +148,7 @@ class mw(QMainWindow):
         #рисование становиться False чтобы при отпуске  кнопки линия переставала рисоваться
         if event.button() == Qt.LeftButton:
           self.drawing = False
+          self.repait()
             
     def paintEvent(self, event):
           canvaspainter = QPainter(self)
@@ -159,24 +160,24 @@ class mw(QMainWindow):
       painter = QPainter(self.image)
       painter.begin(self.image)
       painter.setPen(QPen(self.brushColor, self.brushSize,self.brushLine , Qt.RoundCap, Qt.RoundJoin))
-      if self.br == 0 or self.br == 4:
+      if self.brushTipe == 0 or self.brushTipe == 4:
         painter.drawLine(self.lastPoint, self.currentPoint)
         self.lastPoint = self.currentPoint
         painter.end()
         self.update()
-      elif self.br == 1:
+      elif self.brushTipe == 1 and not(self.drawing):
         painter.drawLine(self.lastPoint, self.currentPoint)
         painter.end()
         self.update()
-      elif self.br == 2:
+      elif self.brushTipe == 2 and not(self.drawing):
         painter.drawEllipse(QRect(self.lastPoint, self.currentPoint))
         painter.end()
         self.update()
-      elif self.br == 3:
+      elif self.brushTipe == 3 and not(self.drawing):
         painter.drawRect(QRect(self.lastPoint, self.currentPoint))
         painter.end()
         self.update()
-      elif self.br == 5:
+      elif self.brushTipe == 5 and not(self.drawing):
         x = QInputDialog(self)
         t, ok= x.getText(self, '',
             'текст для рисовки:')
@@ -247,32 +248,32 @@ class mw(QMainWindow):
           self.update()
 
     def pensil(self):
-      self.br = 0
+      self.brushTipe = 0
       self.brushSize = 2
       self.Solid()
 
     def line(self):
-      self.br = 1
+      self.brushTipe = 1
       self.brushSize = 2
       self.Solid()
     
     def circle(self):
-      self.br = 2
+      self.brushTipe = 2
       self.brushSize = 2
       self.Solid()
     
     def rect(self):
-      self.br = 3
+      self.brushTipe = 3
       self.brushSize = 2
       self.Solid()
 
     def bline(self):
-      self.br = 4
+      self.brushTipe = 4
       self.brushSize = 21
       self.Solid()
 
     def text(self):
-      self.br = 5
+      self.brushTipe = 5
       self.brushSize = 2
       self.Solid()
 
